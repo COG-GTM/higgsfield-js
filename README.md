@@ -170,6 +170,58 @@ if (jobSet.isCompleted) {
 }
 ```
 
+#### Video-to-Video (Genjutsu)
+
+[Genjutsu](https://docs.higgsfield.ai/docs/models/genjutsu) restyles a source video, transfers its motion onto reference characters, or swaps an object in it. All three endpoints take a `video_url` (4–30 s source; longer clips are trimmed to 30 s) and return a single `video.url`. Genjutsu jobs are slow — expect roughly 5–7 minutes per clip — so raise `maxPollTime` above the 5-minute default before using `withPolling: true`.
+
+```typescript
+import { higgsfield, config, GenjutsuResolution, GenjutsuRestylePreset } from '@higgsfield/client/v2';
+
+config({
+  credentials: 'YOUR_KEY_ID:YOUR_KEY_SECRET',
+  maxPollTime: 15 * 60 * 1000 // Genjutsu renders take ~5–7 min; default 300000 ms times out
+});
+
+// Restyle: change the look of a video while keeping its motion, framing and audio.
+// preset_id comes from GET /models/higgsfield/genjutsu/restyle/v1.0/presets
+// (GenjutsuRestylePreset is a snapshot of that catalog).
+const restyled = await higgsfield.subscribe('higgsfield/genjutsu/restyle/v1.0', {
+  input: {
+    video_url: 'https://example.com/input.mp4',
+    preset_id: GenjutsuRestylePreset.CEL_SHADED_CG_ANIME,
+    image_urls: [],                          // optional character references (max 5)
+    prompt: 'Preserve the original movement and camera composition.',
+    resolution: GenjutsuResolution.HD        // '480p' | '720p' | '1080p'
+  },
+  withPolling: true
+});
+
+if (restyled.status === 'completed') {
+  console.log('Video URL:', restyled.video?.url);
+}
+
+// Motion transfer: drive the character(s) in image_urls (1–8) with the source video's motion.
+const transferred = await higgsfield.subscribe('higgsfield/genjutsu/motion-transfer/v1.0', {
+  input: {
+    video_url: 'https://example.com/dance.mp4',
+    image_urls: ['https://example.com/character.png']
+  },
+  withPolling: true
+});
+
+// Object swap: replace an object/character in the video with the one in image_urls (1–8).
+const swapped = await higgsfield.subscribe('higgsfield/genjutsu/object-swap/v1.0', {
+  input: {
+    video_url: 'https://example.com/input.mp4',
+    image_urls: ['https://example.com/new-object.png'],
+    prompt: 'Swap the handbag for the referenced one.'
+  },
+  withPolling: true
+});
+```
+
+Typed inputs are available as `GenjutsuRestyleInput`, `GenjutsuMotionTransferInput` and `GenjutsuObjectSwapInput`.
+
 ### Polling & Status Lifecycle
 
 The v2 client automatically polls `/requests/{request_id}/status` when `withPolling` is `true`. The API returns responses with the following structure:

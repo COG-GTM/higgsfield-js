@@ -172,6 +172,51 @@ export const SpeakDuration = {
 } as const;
 
 /**
+ * Output resolution options for Genjutsu video-to-video endpoints
+ * (restyle, motion-transfer, object-swap)
+ * @example
+ * resolution: GenjutsuResolution.HD // 720p output (API default)
+ */
+export const GenjutsuResolution = {
+    /** 480p output */
+    SD: '480p',
+    /** 720p output (default) */
+    HD: '720p',
+    /** 1080p output */
+    FHD: '1080p'
+} as const;
+
+/**
+ * Style presets for Genjutsu Restyle (`higgsfield/genjutsu/restyle/v1.0`), name -> preset_id.
+ * Snapshot of GET /models/higgsfield/genjutsu/restyle/v1.0/presets taken 2026-11-01;
+ * the catalog can change, so fetch it at runtime when you need the current list.
+ * @example
+ * preset_id: GenjutsuRestylePreset.CEL_SHADED_CG_ANIME
+ */
+export const GenjutsuRestylePreset = {
+    CEL_SHADED_CG_ANIME: 'c2143317-f28d-4c3c-a0b8-39bd547e08a7',
+    CHUNKY_TEXTURED_LOW_POLY: 'f1d0c30d-a2ec-4c33-a892-d8d158e2d093',
+    COMIC_3D: '3dc6d454-808d-4e27-8a4e-4751da818324',
+    EXPRESSIVE_2D_ANIMATION: '368c6a65-4a48-4e3a-80c7-c460455b5e17',
+    EXPRESSIVE_GOUACHE_FASHION: '89484749-e1b9-40c9-979e-fc578c3aad6d',
+    FELT_PUPPET_STOP_MOTION: 'bf6aee41-83a8-433c-b5a5-2309c7bd5b26',
+    GRAPHIC_CEL: '523cf5be-67fc-46d6-bfdb-56ccc3e2a8f6',
+    GROTESQUE_STREET_CGI: 'c3268f8d-4cc0-423c-975d-ca1bf7df385a',
+    HAND_PAINTED_CEL_ANIMATION: '067b27d4-8d8f-44d1-a24b-0f4c28012e4b',
+    KNITTED_YARN_WORLD: '2b5b68c4-9253-4d79-9d05-81e7718d8d7a',
+    NEON_GRAPHIC_CINEMATIC_3D: '41d02f6d-1d5d-4efa-9942-9fe71de9429b',
+    NIGHTTIME_ANIME_PIXEL_ART: 'e54beac7-ca48-4034-856b-0a6f2b05081a',
+    OUTLINE_FREE_CEL: '55aee79b-bb36-40e3-b957-205e6867a3d9',
+    PAINTERLY_CINEMATIC_3D: '85bc9e2c-f896-41d7-b280-53f2f5e321ac',
+    PAINTERLY_SCULPTED_ANIMATION: '083abd05-afbd-4cda-857f-7f2d2082e9b2',
+    RETRO_GAME_3D: '255f5244-b43d-43fc-9c28-7138f8c12984',
+    ROUNDED_TOY_CGI: '6bce8e75-df92-487f-a4f0-a324a6a297f3',
+    SCULPTURAL_3D_FASHION: 'f7786536-123b-47b8-ab65-ee0647df1509',
+    TEXTURED_GOUACHE_CHARACTER_ILLUSTRATION: 'f2b4e920-3b1e-4931-8a86-b06566005145',
+    WARM_PAINTERLY_3D_ANIMATION: 'e82b7bbb-c8bf-4d70-a866-e7b15e744a2b'
+} as const;
+
+/**
  * Creates a webhook configuration object
  * @param url - The webhook endpoint URL
  * @param secret - The secret key for webhook authentication (sent as X-Webhook-Secret-Key header)
