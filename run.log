@@ -1,0 +1,8 @@
+# higgsfield-js README Genjutsu example, node v22.23.4, started 2026-11-02T00:45:49Z
+[trace 2026-11-02T00:45:49.894Z] GET /models/higgsfield/genjutsu/restyle/v1.0/presets -> 20 presets
+20 presets, using "Cel-Shaded CG Anime" (c2143317-f28d-4c3c-a0b8-39bd547e08a7)
+[trace 2026-11-02T00:45:50.130Z] POST /higgsfield/genjutsu/restyle/v1.0 -> status=queued request_id=01a199b8-3a47-7c60-a91a-1989e41c14c4
+[trace 2026-11-02T00:45:56.978Z] GET /requests/01a199b8-3a47-7c60-a91a-1989e41c14c4/status -> status=in_progress request_id=01a199b8-3a47-7c60-a91a-1989e41c14c4
+[trace 2026-11-02T00:55:02.064Z] GET /requests/01a199b8-3a47-7c60-a91a-1989e41c14c4/status -> status=completed request_id=01a199b8-3a47-7c60-a91a-1989e41c14c4
+completed 01a199b8-3a47-7c60-a91a-1989e41c14c4 https://d3u0tzju9qaucj.cloudfront.net/a4086dbb-d386-4bab-8efd-636d1f91e38e/01a199b8-3a47-7c60-a91a-1989e41c14c4/741620ac-0f5f-42bc-8d94-a1be19714653.mp4
+exit=0 finished 2026-11-02T00:55:02Z
