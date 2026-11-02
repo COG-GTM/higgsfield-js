@@ -1,3 +1,9 @@
+import {
+  GenjutsuMotionTransferInput,
+  GenjutsuObjectSwapInput,
+  GenjutsuRestyleInput,
+} from '../types';
+
 // Base endpoint input types for known endpoints
 export interface DoPImage2VideoInput {
   model: 'dop-lite' | 'dop-turbo' | 'dop-standard';
@@ -51,6 +57,9 @@ export interface EndpointInputMap {
   '/v1/image2video/dop': DoPImage2VideoInput;
   '/v1/speak/higgsfield': SpeakVideoInput;
   '/v1/text2image/soul': SoulText2ImageInput;
+  'higgsfield/genjutsu/restyle/v1.0': GenjutsuRestyleInput;
+  'higgsfield/genjutsu/motion-transfer/v1.0': GenjutsuMotionTransferInput;
+  'higgsfield/genjutsu/object-swap/v1.0': GenjutsuObjectSwapInput;
 }
 
 // Helper type to extract input type from endpoint
