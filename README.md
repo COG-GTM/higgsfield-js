@@ -208,8 +208,8 @@ const restyle = await higgsfield.subscribe('higgsfield/genjutsu/restyle/v1.0', {
   withPolling: true
 });
 
-if (motion.isCompleted) {
-  console.log('Video URL:', motion.jobs[0].results?.raw.url);
+if (motion.status === 'completed') {
+  console.log('Video URL:', motion.video?.url);
 }
 ```
 
