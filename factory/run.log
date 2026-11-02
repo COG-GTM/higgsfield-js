@@ -1,0 +1,12 @@
+[   0.1s] presets in helper: 20 | resolutions: 480p,720p,1080p
+[ 425.4s] DONE
+{
+  "status": "completed",
+  "request_id": "01a19987-1c83-7652-b0b4-14a5985567cd",
+  "status_url": "https://api.higgsfield.ai/requests/01a19987-1c83-7652-b0b4-14a5985567cd/status",
+  "cancel_url": "https://api.higgsfield.ai/requests/01a19987-1c83-7652-b0b4-14a5985567cd/cancel",
+  "expires_at": "2026-11-08T23:59:14.055072+00:00",
+  "video": {
+    "url": "https://d3u0tzju9qaucj.cloudfront.net/a4086dbb-d386-4bab-8efd-636d1f91e38e/01a19987-1c83-7652-b0b4-14a5985567cd/17e40e35-9b96-4c74-9026-33fad7a7e601.mp4"
+  }
+}
