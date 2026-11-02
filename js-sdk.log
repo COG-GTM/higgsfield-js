@@ -1,0 +1,2 @@
+2026-11-02T19:09:15.808Z start higgsfield.subscribe higgsfield/genjutsu/restyle/v1.0 (480p, Cel-Shaded CG Anime) withPolling maxPollTime=900000ms
+2026-11-02T19:24:16.366Z error TimeoutError: Polling exceeded maximum time of 900000ms
