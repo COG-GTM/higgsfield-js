@@ -90,3 +90,52 @@ export interface SoulIdListResponse {
   total_pages: number;
   items: SoulIdData[];
 }
+
+/** Output resolution for Genjutsu video-to-video endpoints */
+export type GenjutsuOutputResolution = '480p' | '720p' | '1080p';
+
+/**
+ * Input for `higgsfield/genjutsu/restyle/v1.0`.
+ * Restyles a source video (>=4 s, <=200 MiB; >30 s is trimmed to the first 30 s)
+ * while keeping motion, composition and source audio. `null` is not accepted for any field.
+ */
+export interface GenjutsuRestyleInput {
+  /** Source video URL */
+  video_url: string;
+  /** Style preset UUID (see GenjutsuRestylePreset or GET /models/higgsfield/genjutsu/restyle/v1.0/presets) */
+  preset_id: string;
+  /** Up to 5 character appearance references (JPEG/PNG, <=64 MiB each). Defaults to [] */
+  image_urls?: string[];
+  /** Extra guidance (max 10000 chars); does not replace the preset. Defaults to "" */
+  prompt?: string;
+  /** Defaults to "720p" */
+  resolution?: GenjutsuOutputResolution;
+}
+
+/**
+ * Input for `higgsfield/genjutsu/motion-transfer/v1.0`.
+ * Transfers the motion of the source video (>=4 s; >30 s trimmed) onto 1-8 ordered image references.
+ */
+export interface GenjutsuMotionTransferInput {
+  /** Source video URL (1-2083 chars) */
+  video_url: string;
+  /** 1-8 ordered image reference URLs */
+  image_urls: string[];
+  /** Extra guidance (max 10000 chars). Defaults to "" */
+  prompt?: string;
+  /** Defaults to "720p" */
+  resolution?: GenjutsuOutputResolution;
+}
+
+/**
+ * Input for `higgsfield/genjutsu/object-swap/v1.0`.
+ * Same inputs as motion transfer; the source video must have >=409,600 px per frame (e.g. 1280x720).
+ */
+export type GenjutsuObjectSwapInput = GenjutsuMotionTransferInput;
+
+/** Style preset returned by GET /models/higgsfield/genjutsu/restyle/v1.0/presets */
+export interface GenjutsuRestylePresetItem {
+  id: string;
+  name: string;
+  preview_url: string;
+}
