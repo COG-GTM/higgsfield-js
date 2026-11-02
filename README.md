@@ -170,6 +170,49 @@ if (jobSet.isCompleted) {
 }
 ```
 
+#### Genjutsu Video-to-Video
+
+[Genjutsu](https://docs.higgsfield.ai/docs/models/genjutsu) transforms a 4–30 second source video. Each workflow is its own endpoint and accepts an optional `prompt` and `resolution` (`480p`, `720p` default, or `1080p`).
+
+```typescript
+// Motion transfer: drive the referenced character(s) with the source video's motion
+const motion = await higgsfield.subscribe('higgsfield/genjutsu/motion-transfer/v1.0', {
+  input: {
+    video_url: 'https://example.com/source.mp4',
+    image_urls: ['https://example.com/character.png'], // 1-8 images
+    prompt: 'Keep the camera locked off',
+    resolution: '720p'
+  },
+  withPolling: true
+});
+
+// Object swap: replace an object in the source video (source must be >= 409,600 px per frame)
+const swap = await higgsfield.subscribe('higgsfield/genjutsu/object-swap/v1.0', {
+  input: {
+    video_url: 'https://example.com/source.mp4',
+    image_urls: ['https://example.com/new-object.png'], // 1-8 images
+    prompt: 'Replace the mug with the red sneaker'
+  },
+  withPolling: true
+});
+
+// Restyle: preset_id must come from the live catalog, never a cached name or example UUID
+// GET https://api.higgsfield.ai/models/higgsfield/genjutsu/restyle/v1.0/presets
+const restyle = await higgsfield.subscribe('higgsfield/genjutsu/restyle/v1.0', {
+  input: {
+    video_url: 'https://example.com/source.mp4', // <= 200 MiB, source audio is kept
+    preset_id: presetIdFromCatalog,
+    image_urls: [], // optional, up to 5 character references
+    resolution: '1080p'
+  },
+  withPolling: true
+});
+
+if (motion.isCompleted) {
+  console.log('Video URL:', motion.jobs[0].results?.raw.url);
+}
+```
+
 ### Polling & Status Lifecycle
 
 The v2 client automatically polls `/requests/{request_id}/status` when `withPolling` is `true`. The API returns responses with the following structure:
