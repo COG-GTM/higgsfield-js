@@ -170,6 +170,63 @@ if (jobSet.isCompleted) {
 }
 ```
 
+#### Video-to-Video (Genjutsu)
+
+Genjutsu restyles a source video, transfers its motion onto image references, or swaps objects in it. Source videos must be at least 4 s; anything over 30 s is trimmed to the first 30 s. Generations take several minutes, so raise `maxPollTime` above the 5-minute default.
+
+```typescript
+import {
+  higgsfield,
+  config,
+  GenjutsuEndpoint,
+  GenjutsuRestylePreset,
+  GenjutsuRestyleInput,
+} from '@higgsfield/client/v2';
+
+config({
+  credentials: process.env.HF_KEY, // "KEY_ID:KEY_SECRET"
+  maxPollTime: 15 * 60 * 1000, // Restyle takes ~7 min for a 10 s clip
+});
+
+// Restyle: keep motion, composition and source audio; change the visual style
+const input: GenjutsuRestyleInput = {
+  video_url: 'https://example.com/source.mp4',
+  preset_id: GenjutsuRestylePreset.CEL_SHADED_CG_ANIME, // send the preset id, not its name
+  image_urls: [], // optional, up to 5 character references
+  prompt: 'Preserve the original movement and camera composition.',
+  resolution: '480p', // '480p' | '720p' (default) | '1080p'
+};
+
+const result = await higgsfield.subscribe('higgsfield/genjutsu/restyle/v1.0', {
+  input,
+  withPolling: true,
+});
+
+console.log(result.status, result.video?.url);
+
+// Motion transfer: animate 1-8 ordered image references with the source video's motion
+await higgsfield.subscribe(GenjutsuEndpoint.MOTION_TRANSFER, {
+  input: {
+    video_url: 'https://example.com/dance.mp4',
+    image_urls: ['https://example.com/character.png'],
+    resolution: '720p',
+  },
+  withPolling: true,
+});
+
+// Object swap: same inputs; the source video needs >= 409,600 px per frame (e.g. 1280x720)
+await higgsfield.subscribe(GenjutsuEndpoint.OBJECT_SWAP, {
+  input: {
+    video_url: 'https://example.com/product-shot.mp4',
+    image_urls: ['https://example.com/new-object.png'],
+    prompt: 'Replace the mug with the bottle',
+  },
+  withPolling: true,
+});
+```
+
+The current Restyle presets are exported as `GenjutsuRestylePreset` (names in `GenjutsuRestylePresetName`). For the live list, call `GET https://api.higgsfield.ai/models/higgsfield/genjutsu/restyle/v1.0/presets` with the same `Authorization: Key KEY_ID:KEY_SECRET` header; it returns `{ model, items: [{ id, name, preview_url }] }`.
+
 ### Polling & Status Lifecycle
 
 The v2 client automatically polls `/requests/{request_id}/status` when `withPolling` is `true`. The API returns responses with the following structure:
