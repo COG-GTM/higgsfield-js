@@ -172,7 +172,7 @@ if (jobSet.isCompleted) {
 
 #### Video-to-Video (Genjutsu)
 
-Genjutsu restyles a source video, transfers its motion onto image references, or swaps objects in it. Source videos must be at least 4 s; anything over 30 s is trimmed to the first 30 s. Generations take several minutes, so raise `maxPollTime` above the 5-minute default.
+Genjutsu restyles a source video, transfers its motion onto image references, or swaps objects in it. Source videos must be at least 4 s; anything over 30 s is trimmed to the first 30 s. Generations take several minutes, so raise `maxPollTime` well above the 5-minute default (30 min recommended; the request can sit queued for several minutes before generation starts).
 
 ```typescript
 import {
@@ -185,7 +185,7 @@ import {
 
 config({
   credentials: process.env.HF_KEY, // "KEY_ID:KEY_SECRET"
-  maxPollTime: 15 * 60 * 1000, // Restyle takes ~7 min for a 10 s clip
+  maxPollTime: 30 * 60 * 1000, // ~7 min generation + queue time (a 15 min poll timed out in live testing)
 });
 
 // Restyle: keep motion, composition and source audio; change the visual style
