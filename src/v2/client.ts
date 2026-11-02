@@ -13,6 +13,8 @@ import {
 } from '../errors';
 import { retryWithBackoff } from '../utils/retry';
 import { V2Response } from './types';
+import { GenjutsuRestylePreset, GenjutsuRestylePresetsResponse } from '../types';
+import { GENJUTSU_RESTYLE_PRESETS_PATH } from '../helpers';
 import { AgentsResource } from '../agents/resources';
 
 export interface V2ClientConfig extends Omit<ClientConfig, 'apiKey' | 'apiSecret'> {
@@ -37,6 +39,9 @@ export interface HiggsfieldClient {
     endpoint: TEndpoint,
     options: SubscribeOptions<any>
   ): Promise<V2Response>;
+
+  /** List the style presets accepted as `preset_id` by `higgsfield/genjutsu/restyle/v1.0` */
+  getGenjutsuRestylePresets(): Promise<GenjutsuRestylePreset[]>;
 
   configure(config: V2ClientConfig): void;
 }
@@ -291,6 +296,20 @@ export function createHiggsfieldClient(
       }
 
       return v2Response;
+    },
+
+    async getGenjutsuRestylePresets(): Promise<GenjutsuRestylePreset[]> {
+      ensureInitialized();
+      const clientConfig = state.config!;
+      const response = await retryWithBackoff(
+        () => state.client!.get<GenjutsuRestylePresetsResponse>(GENJUTSU_RESTYLE_PRESETS_PATH),
+        {
+          maxRetries: clientConfig.maxRetries,
+          backoff: clientConfig.retryBackoff,
+          maxBackoff: clientConfig.retryMaxBackoff,
+        }
+      );
+      return response.data.items;
     },
 
     configure(config: V2ClientConfig): void {

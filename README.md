@@ -170,6 +170,68 @@ if (jobSet.isCompleted) {
 }
 ```
 
+#### Video-to-Video with Genjutsu
+
+[Genjutsu](https://docs.higgsfield.ai/docs/models/genjutsu) has three variants: Restyle, Motion Transfer and Object Swap. Each takes a source `video_url` (at least 4 s; longer than 30 s is trimmed) and returns `result.video.url`. A job usually takes several minutes, so raise `maxPollTime` above the 5-minute default.
+
+**Restyle** applies a style preset. Fetch the current preset list with `getGenjutsuRestylePresets()` and don't hardcode preset ids:
+
+```javascript
+import { config, higgsfield, GenjutsuEndpoint, GenjutsuResolution } from '@higgsfield/client/v2';
+
+config({
+  credentials: process.env.HF_CREDENTIALS,
+  maxPollTime: 15 * 60 * 1000 // Genjutsu jobs take ~5-7 minutes
+});
+
+// GET /models/higgsfield/genjutsu/restyle/v1.0/presets -> [{ id, name, preview_url }]
+const presets = await higgsfield.getGenjutsuRestylePresets();
+const preset = presets.find((p) => p.name === 'Cel-Shaded CG Anime');
+console.log(`${presets.length} presets, using "${preset.name}" (${preset.id})`);
+
+const result = await higgsfield.subscribe(GenjutsuEndpoint.RESTYLE, {
+  input: {
+    video_url: 'https://d3snorpfx4xhv8.cloudfront.net/a4086dbb-d386-4bab-8efd-636d1f91e38e/59dac11e-bd99-4bc7-a627-2638e7ad9840.mp4',
+    preset_id: preset.id,
+    image_urls: [], // optional character references (0-5); omit or pass [], never null
+    prompt: 'Preserve the original movement and camera composition.',
+    resolution: GenjutsuResolution.SD // '480p' | '720p' (default) | '1080p'
+  },
+  withPolling: true
+});
+
+console.log(result.status, result.request_id, result.video?.url);
+```
+
+The source video can be up to 200 MiB, and its audio is kept. Restyle accepts only the five fields shown above.
+
+**Motion Transfer** moves 1-8 reference characters along the source video's motion:
+
+```javascript
+const result = await higgsfield.subscribe(GenjutsuEndpoint.MOTION_TRANSFER, {
+  input: {
+    video_url: 'https://example.com/dance.mp4',
+    image_urls: ['https://example.com/character.png'], // 1-8 images
+    prompt: 'Keep the camera locked off.',
+    resolution: GenjutsuResolution.HD
+  }
+});
+```
+
+**Object Swap** replaces an object or character with 1-8 reference images. Source frames must be at least 409,600 px (1280x720 works, 854x480 doesn't):
+
+```javascript
+const result = await higgsfield.subscribe(GenjutsuEndpoint.OBJECT_SWAP, {
+  input: {
+    video_url: 'https://example.com/street-1280x720.mp4',
+    image_urls: ['https://example.com/red-sports-car.png'], // 1-8 images
+    prompt: 'Replace the parked car with the red sports car.'
+  }
+});
+```
+
+The API only fetches files it can access. Upload local files first, for example with `upload()` on the v1 client. In TypeScript, `EndpointInput<'higgsfield/genjutsu/restyle/v1.0'>` (also `GenjutsuRestyleInput`, `GenjutsuMotionTransferInput`, `GenjutsuObjectSwapInput`) types the `input` object.
+
 ### Polling & Status Lifecycle
 
 The v2 client automatically polls `/requests/{request_id}/status` when `withPolling` is `true`. The API returns responses with the following structure:

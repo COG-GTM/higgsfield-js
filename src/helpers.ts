@@ -172,6 +172,41 @@ export const SpeakDuration = {
 } as const;
 
 /**
+ * Endpoint ids for the Genjutsu video-to-video model
+ * (legacy `higgsfiled/...` ids still resolve but are hidden; use these)
+ * @example
+ * await higgsfield.subscribe(GenjutsuEndpoint.RESTYLE, { input: { ... } });
+ */
+export const GenjutsuEndpoint = {
+    /** Transfer the source video's motion onto 1–8 reference characters */
+    MOTION_TRANSFER: 'higgsfield/genjutsu/motion-transfer/v1.0',
+    /** Replace an object or character in the source video with 1–8 reference images */
+    OBJECT_SWAP: 'higgsfield/genjutsu/object-swap/v1.0',
+    /** Restyle the source video with a preset from GENJUTSU_RESTYLE_PRESETS_PATH */
+    RESTYLE: 'higgsfield/genjutsu/restyle/v1.0'
+} as const;
+
+/**
+ * Output resolution options for all Genjutsu endpoints
+ * @example
+ * resolution: GenjutsuResolution.SD // 480p, cheapest tier
+ */
+export const GenjutsuResolution = {
+    /** 480p output */
+    SD: '480p',
+    /** 720p output (API default) */
+    HD: '720p',
+    /** 1080p output */
+    FHD: '1080p'
+} as const;
+
+/**
+ * Path (relative to the API base URL) that lists Genjutsu Restyle presets.
+ * Use `client.getGenjutsuRestylePresets()` on the v2 client to fetch it.
+ */
+export const GENJUTSU_RESTYLE_PRESETS_PATH = '/models/higgsfield/genjutsu/restyle/v1.0/presets';
+
+/**
  * Creates a webhook configuration object
  * @param url - The webhook endpoint URL
  * @param secret - The secret key for webhook authentication (sent as X-Webhook-Secret-Key header)
