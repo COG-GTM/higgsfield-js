@@ -556,21 +556,23 @@ try {
 ### Job Status Handling
 
 ```typescript
-for (const job of jobSet.jobs) {
-  switch (job.status) {
-    case 'completed':
-      console.log('Success:', job.results?.raw.url);
-      break;
-    case 'failed':
-      console.error('Generation failed');
-      break;
-    case 'nsfw':
-      console.warn('Content flagged as NSFW');
-      break;
-    case 'canceled':
-      console.warn('Job was canceled');
-      break;
-  }
+const result = await higgsfield.subscribe('flux-pro/kontext/max/text-to-image', {
+  input: { prompt: 'Test' },
+  withPolling: true
+});
+
+switch (result.status) {
+  case 'completed':
+    console.log('Success:', result.images?.[0]?.url ?? result.video?.url);
+    break;
+  case 'failed':
+    console.error('Generation failed');
+    break;
+  case 'nsfw':
+    console.warn('Content flagged as NSFW');
+    break;
+  default: // 'queued' | 'in_progress' (when withPolling is false)
+    console.log('Still processing:', result.request_id);
 }
 ```
 
@@ -615,8 +617,8 @@ for (const job of jobSet.jobs) {
 ## Development
 
 To build and test the SDK from source, use Node.js 22.23.4 (`.nvmrc`; `nvm use`).
-`package.json` `devEngines` makes npm 10.9+ stop with `EBADDEVENGINES` under other Node
-versions. `.npmrc` and `package-lock.json` resolve packages from Higgsfield's
+`package.json` `devEngines` accepts Node `^22.23.4 || ^24.22.1 || >=26.12.1`; under any
+other Node version npm 10.9+ stops with `EBADDEVENGINES`. `.npmrc` and `package-lock.json` resolve packages from Higgsfield's
 Socket registry (`https://socket.higgsfield.xyz/npm`), so `npm ci` needs network
 access to that host.
 
