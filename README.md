@@ -22,6 +22,11 @@ The v2 client is the modern, recommended way to use the Higgsfield SDK. It featu
 
 ### Quick Start
 
+The snippet uses top-level `await`, so run it as an ES module: save it as
+`quickstart.mts` and run `npx tsx quickstart.mts` (or remove the types and run a
+`.mjs` file with `node`). Replace the placeholder credentials with your own;
+the placeholders return `AuthenticationError: Invalid API credentials`.
+
 ```typescript
 import { higgsfield, config } from '@higgsfield/client/v2';
 
@@ -41,8 +46,8 @@ const jobSet = await higgsfield.subscribe('flux-pro/kontext/max/text-to-image', 
   withPolling: true
 });
 
-if (jobSet.isCompleted) {
-  console.log('Image URL:', jobSet.jobs[0].results?.raw.url);
+if (jobSet.status === 'completed') {
+  console.log('Image URL:', jobSet.images?.[0]?.url);
 }
 ```
 
@@ -76,6 +81,8 @@ export HF_CREDENTIALS="YOUR_KEY_ID:YOUR_KEY_SECRET"
 export HF_API_KEY="YOUR_KEY_ID"
 export HF_API_SECRET="YOUR_KEY_SECRET"
 ```
+
+`HF_KEY` is accepted as an alias for `HF_CREDENTIALS`.
 
 ```typescript
 // No config needed - automatically reads from environment
@@ -145,8 +152,8 @@ const jobSet = await higgsfield.subscribe('flux-pro/kontext/max/text-to-image', 
   withPolling: true
 });
 
-if (jobSet.isCompleted) {
-  console.log('Image URL:', jobSet.jobs[0].results?.raw.url);
+if (jobSet.status === 'completed') {
+  console.log('Image URL:', jobSet.images?.[0]?.url);
 }
 ```
 
@@ -165,8 +172,8 @@ const jobSet = await higgsfield.subscribe('/v1/image2video/dop', {
   withPolling: true
 });
 
-if (jobSet.isCompleted) {
-  console.log('Video URL:', jobSet.jobs[0].results?.raw.url);
+if (jobSet.status === 'completed') {
+  console.log('Video URL:', jobSet.video?.url);
 }
 ```
 
@@ -193,29 +200,26 @@ The v2 client automatically polls `/requests/{request_id}/status` when `withPoll
 }
 ```
 
-The SDK automatically converts this response into a `JobSet` with a single job, mapping `images`/`video` to `results.raw` and `results.min` for compatibility with existing code.
+`subscribe()` returns this response object (`V2Response`) as is; it does not
+convert it into a `JobSet`.
 
-### Working with JobSet
+### Working with the response
 
 ```typescript
-const jobSet = await higgsfield.subscribe('flux-pro/kontext/max/text-to-image', {
+const result = await higgsfield.subscribe('flux-pro/kontext/max/text-to-image', {
   input: { prompt: 'Test' },
   withPolling: true
 });
 
-// Check status
-console.log('JobSet ID:', jobSet.id);
-console.log('Is completed:', jobSet.isCompleted);
-console.log('Is queued:', jobSet.isQueued);
-console.log('Is in progress:', jobSet.isInProgress);
-console.log('Is failed:', jobSet.isFailed);
-console.log('Is NSFW:', jobSet.isNsfw);
+console.log('Request ID:', result.request_id);
+console.log('Status:', result.status); // queued | in_progress | completed | failed | nsfw
 
-// Access results
-for (const job of jobSet.jobs) {
-  if (job.results) {
-    console.log('Result URL:', job.results.raw.url);
-    console.log('Thumbnail URL:', job.results.min.url);
+if (result.status === 'completed') {
+  for (const image of result.images ?? []) {
+    console.log('Image URL:', image.url);
+  }
+  if (result.video) {
+    console.log('Video URL:', result.video.url);
   }
 }
 ```
@@ -248,14 +252,14 @@ const client = createHiggsfieldClient({
 import { 
   createHiggsfieldClient,
   HiggsfieldClient,
-  JobSet
+  V2Response
 } from '@higgsfield/client/v2';
 
 const client: HiggsfieldClient = createHiggsfieldClient({
   credentials: 'YOUR_KEY_ID:YOUR_KEY_SECRET'
 });
 
-const jobSet: JobSet = await client.subscribe('flux-pro/kontext/max/text-to-image', {
+const jobSet: V2Response = await client.subscribe('flux-pro/kontext/max/text-to-image', {
   input: {
     prompt: 'Test',
     aspect_ratio: '1:1'
@@ -348,7 +352,7 @@ const client = new HiggsfieldClient({
 **Option 2: Use environment variables**
 ```bash
 export HF_API_KEY="YOUR_API_KEY"
-export HF_SECRET="YOUR_API_SECRET"
+export HF_API_SECRET="YOUR_API_SECRET"
 ```
 
 ```typescript
@@ -607,6 +611,21 @@ for (const job of jobSet.jobs) {
    ```
 
 ---
+
+## Development
+
+To build and test the SDK from source, use Node.js 22.23.4 (`.nvmrc`; `nvm use`).
+`package.json` `devEngines` makes npm 10.9+ stop with `EBADDEVENGINES` under other Node
+versions. `.npmrc` and `package-lock.json` resolve packages from Higgsfield's
+Socket registry (`https://socket.higgsfield.xyz/npm`), so `npm ci` needs network
+access to that host.
+
+```bash
+nvm use
+npm ci
+npm run build
+npm test
+```
 
 ## Support
 
